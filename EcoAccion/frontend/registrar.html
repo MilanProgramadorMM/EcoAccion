@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoAccion — Registrar acción</title>
+  <link rel="stylesheet" href="css/estilos.css" />
+</head>
+<body>
+  <div class="telefono">
+    <!-- HU03: Registrar acción sostenible -->
+    <header class="encabezado">
+      <a class="flecha" href="ranking.html" title="Volver">&larr;</a>
+      <h1>Registrar acción</h1>
+    </header>
+
+    <!-- Aviso de éxito/error (notifica al usuario, criterio HU03) -->
+    <div id="aviso" class="aviso" role="status" aria-live="polite"></div>
+
+    <main class="contenido">
+      <form id="form-accion" novalidate>
+        <!-- Tipo de acción (categoría) -->
+        <div class="campo" id="campo-categoria">
+          <label for="categoria">Tipo de acción</label>
+          <select id="categoria" name="categoria">
+            <option value="">Seleccionar tipo</option>
+            <!-- Las opciones se cargan desde el backend (/api/categorias) -->
+          </select>
+          <div class="error-campo" id="error-categoria"></div>
+        </div>
+
+        <!-- Fecha -->
+        <div class="campo" id="campo-fecha">
+          <label for="fecha">Fecha</label>
+          <input type="date" id="fecha" name="fecha" />
+          <div class="error-campo" id="error-fecha"></div>
+        </div>
+
+        <!-- Descripción (máx. 200) -->
+        <div class="campo" id="campo-descripcion">
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion" name="descripcion" maxlength="200"
+                    placeholder="Describe tu acción..."></textarea>
+          <div class="contador"><span id="contador">0</span>/200</div>
+          <div class="error-campo" id="error-descripcion"></div>
+        </div>
+
+        <button type="submit" class="boton-primario" id="btn-guardar">
+          Guardar acción
+        </button>
+      </form>
+    </main>
+
+    <!-- Navegación inferior -->
+    <nav class="nav-inferior">
+      <a href="registrar.html" class="activo"><span class="icono">➕</span>Registrar</a>
+      <a href="ranking.html"><span class="icono">🏆</span>Ranking</a>
+    </nav>
+  </div>
+
+  <script src="js/registrar.js"></script>
+</body>
+</html>

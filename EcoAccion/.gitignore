@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Base de datos local (se genera sola al ejecutar)
+backend/ecoaccion.db
+
+# Sistema / editores
+.DS_Store
+.idea/
+.vscode/
