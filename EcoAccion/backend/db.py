@@ -7,6 +7,7 @@ de base de datos hace que app.py se enfoque solo en las rutas/API.
 """
 import os
 import sqlite3
+from datetime import datetime
 
 # La base de datos vive junto a este archivo (backend/ecoaccion.db)
 DB_PATH = os.path.join(os.path.dirname(__file__), "ecoaccion.db")
@@ -14,13 +15,33 @@ DB_PATH = os.path.join(os.path.dirname(__file__), "ecoaccion.db")
 # Categorías de acción sostenible y los puntos que otorga cada una.
 # Cada categoría se asocia a un ODS (Objetivo de Desarrollo Sostenible),
 # lo cual conecta con la HU03 ("conocer mi progreso frente a los ODS").
+# "impacto" son los valores estimados que aporta CADA acción de esa
+# categoría y alimentan la HU06 ("visualizar impacto ambiental").
 CATEGORIAS = {
-    "reciclaje":        {"puntos": 20, "ods": "ODS 12 - Producción y consumo responsables"},
-    "movilidad":        {"puntos": 25, "ods": "ODS 11 - Ciudades y comunidades sostenibles"},
-    "ahorro_energia":   {"puntos": 15, "ods": "ODS 7 - Energía asequible y no contaminante"},
-    "ahorro_agua":      {"puntos": 15, "ods": "ODS 6 - Agua limpia y saneamiento"},
-    "consumo_local":    {"puntos": 10, "ods": "ODS 12 - Producción y consumo responsables"},
-    "reforestacion":    {"puntos": 30, "ods": "ODS 15 - Vida de ecosistemas terrestres"},
+    "reciclaje": {
+        "puntos": 20, "ods": "ODS 12 - Producción y consumo responsables",
+        "impacto": {"co2": 2, "agua": 0, "energia": 0, "arboles": 0},
+    },
+    "movilidad": {
+        "puntos": 25, "ods": "ODS 11 - Ciudades y comunidades sostenibles",
+        "impacto": {"co2": 3, "agua": 0, "energia": 0, "arboles": 0},
+    },
+    "ahorro_energia": {
+        "puntos": 15, "ods": "ODS 7 - Energía asequible y no contaminante",
+        "impacto": {"co2": 1, "agua": 0, "energia": 5, "arboles": 0},
+    },
+    "ahorro_agua": {
+        "puntos": 15, "ods": "ODS 6 - Agua limpia y saneamiento",
+        "impacto": {"co2": 0, "agua": 40, "energia": 0, "arboles": 0},
+    },
+    "consumo_local": {
+        "puntos": 10, "ods": "ODS 12 - Producción y consumo responsables",
+        "impacto": {"co2": 1, "agua": 0, "energia": 0, "arboles": 0},
+    },
+    "reforestacion": {
+        "puntos": 30, "ods": "ODS 15 - Vida de ecosistemas terrestres",
+        "impacto": {"co2": 5, "agua": 0, "energia": 0, "arboles": 1},
+    },
 }
 
 
@@ -95,6 +116,68 @@ def get_usuario_actual():
     fila = conn.execute("SELECT * FROM usuarios WHERE es_actual = 1 LIMIT 1;").fetchone()
     conn.close()
     return fila
+
+
+def get_estadisticas(usuario_id, periodo="mes"):
+    """
+    Calcula el resumen de impacto ambiental de un usuario (HU06).
+
+    - periodo="mes":  solo acciones registradas desde el día 1 del mes actual.
+    - periodo="todo": historial completo del usuario.
+
+    Los indicadores (CO2 evitado, agua ahorrada, energía ahorrada, árboles
+    plantados) se derivan de la categoría de cada acción registrada, así que
+    se recalculan siempre que el usuario registra una acción nueva.
+    """
+    conn = get_connection()
+    if periodo == "mes":
+        desde = datetime.now().strftime("%Y-%m-01")
+        filas = conn.execute(
+            """
+            SELECT categoria, COUNT(*) AS cantidad, SUM(puntos) AS puntos
+            FROM acciones
+            WHERE usuario_id = ? AND fecha >= ?
+            GROUP BY categoria;
+            """,
+            (usuario_id, desde),
+        ).fetchall()
+    else:
+        filas = conn.execute(
+            """
+            SELECT categoria, COUNT(*) AS cantidad, SUM(puntos) AS puntos
+            FROM acciones
+            WHERE usuario_id = ?
+            GROUP BY categoria;
+            """,
+            (usuario_id,),
+        ).fetchall()
+    conn.close()
+
+    total_acciones = 0
+    total_puntos = 0
+    co2 = agua = energia = arboles = 0
+
+    for fila in filas:
+        cantidad = fila["cantidad"]
+        total_acciones += cantidad
+        total_puntos += fila["puntos"] or 0
+
+        impacto = CATEGORIAS.get(fila["categoria"], {}).get("impacto", {})
+        co2 += impacto.get("co2", 0) * cantidad
+        agua += impacto.get("agua", 0) * cantidad
+        energia += impacto.get("energia", 0) * cantidad
+        arboles += impacto.get("arboles", 0) * cantidad
+
+    return {
+        "total_acciones": total_acciones,
+        "total_puntos": total_puntos,
+        "impacto": {
+            "co2_evitado": co2,
+            "agua_ahorrada": agua,
+            "energia_ahorrada": energia,
+            "arboles_plantados": arboles,
+        },
+    }
 
 
 if __name__ == "__main__":
