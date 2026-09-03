@@ -191,6 +191,40 @@ def obtener_ranking():
     return jsonify({"ok": True, "tipo": tipo, "ranking": ranking})
 
 
+# ---------------------------------------------------------------------------
+#  HU06 — Visualizar impacto ambiental
+# ---------------------------------------------------------------------------
+@app.route("/api/estadisticas", methods=["GET"])
+def obtener_estadisticas():
+    """
+    Devuelve el resumen de impacto ambiental del usuario autenticado.
+
+    Criterios de aceptación (Trello HU06):
+      - Muestra información resumida de acciones, puntos e impacto.
+      - Se recalcula siempre (no se cachea) para reflejar acciones nuevas.
+      - Si el usuario no tiene acciones, total_acciones queda en 0 para que
+        el frontend muestre un estado vacío en vez de datos engañosos.
+    Parámetro opcional ?periodo=todo para ver el historial completo
+    (por defecto solo se cuenta el mes actual, como en el mockup).
+    """
+    periodo = (request.args.get("periodo") or "mes").lower()
+    if periodo not in ("mes", "todo"):
+        periodo = "mes"
+
+    usuario = db.get_usuario_actual()
+    if usuario is None:
+        return jsonify({"ok": False, "mensaje": "No hay un usuario autenticado."}), 401
+
+    estadisticas = db.get_estadisticas(usuario["id"], periodo)
+
+    return jsonify({
+        "ok": True,
+        "periodo": periodo,
+        "usuario": usuario["nombre"],
+        **estadisticas,
+    })
+
+
 if __name__ == "__main__":
     # debug=True recarga el servidor al guardar cambios (útil mientras desarrollas)
     app.run(host="127.0.0.1", port=5000, debug=True)

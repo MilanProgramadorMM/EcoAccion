@@ -234,6 +234,105 @@ body {
 .cargando { text-align: center; color: var(--gris-suave); padding: 30px 0; }
 
 /* -------------------------------------------------------------------------
+   Mi impacto (HU06)
+   ------------------------------------------------------------------------- */
+.selector-periodo {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--gris-texto);
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px;
+}
+
+.tarjeta-puntos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 26px 20px;
+  margin-bottom: 24px;
+  text-align: center;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--blanco);
+}
+
+.etiqueta-puntos {
+  font-size: 14px;
+  color: var(--gris-suave);
+}
+
+.valor-puntos {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--gris-texto);
+}
+
+.valor-puntos span:last-child { font-size: 18px; font-weight: 400; color: var(--gris-suave); }
+
+.subtitulo-puntos {
+  font-size: 13px;
+  color: var(--gris-suave);
+}
+
+.titulo-seccion {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 14px;
+}
+
+.grid-impacto {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.tarjeta-impacto {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--blanco);
+}
+
+.etiqueta-impacto {
+  font-size: 13px;
+  color: var(--gris-suave);
+}
+
+.valor-impacto {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--verde);
+}
+
+.estado-vacio {
+  text-align: center;
+  padding: 50px 10px;
+  color: var(--gris-suave);
+}
+
+.estado-vacio p { margin: 0 0 20px; font-size: 15px; }
+
+.boton-enlace {
+  display: inline-block;
+  width: auto;
+  padding: 14px 24px;
+  text-decoration: none;
+}
+
+/* -------------------------------------------------------------------------
    Barra de navegación inferior (compartida)
    ------------------------------------------------------------------------- */
 .nav-inferior {
